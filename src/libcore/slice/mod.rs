@@ -1443,6 +1443,25 @@ impl<T> [T] {
         sort::quicksort(self, |a, b| f(a).lt(&f(b)));
     }
 
+    /// Returns whether the slice is sorted.
+    #[unstable(feature = "is_sorted", issue = "0")]
+    #[inline]
+    pub fn is_sorted(&self) -> bool where T: Ord { self.is_sorted_by(Ord::cmp) }
+
+    /// Returns whether the slice is sorted by the given comparator.
+    #[unstable(feature = "is_sorted", issue = "0")]
+    #[inline]
+    pub fn is_sorted_by<F>(&self, mut f: F) -> bool where F: FnMut(&T, &T) -> Ordering {
+        (1..self.len()).all(|k| Ordering::Less != f(&self[k], &self[k-1]))
+    }
+
+    /// Returns whether the slice is sorted by the given key.
+    #[unstable(feature = "is_sorted", issue = "0")]
+    #[inline]
+    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool where F: FnMut(&T) -> K, K: Ord {
+        self.is_sorted_by(|a, b| Ord::cmp(&f(a), &f(b)))
+    }
+
     /// Rotates the slice in-place such that the first `mid` elements of the
     /// slice move to the end while the last `self.len() - mid` elements move to
     /// the front. After calling `rotate_left`, the element previously at index
